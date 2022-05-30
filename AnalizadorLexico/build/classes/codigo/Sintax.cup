@@ -1,0 +1,97 @@
+package codigo;
+
+import java_cup.runtime.Symbol;
+
+parser code
+{:
+    private Symbol s;
+    
+    public void syntax_error(Symbol s){
+        this.s = s;
+    }
+
+    public Symbol getS(){
+        return this.s;
+}
+:};
+
+terminal Cadena, And, Or, Not, OperadorBooleano, IgualQue, NoIgualQue, ListadoSi, ListadoNo,
+         Dolar, ObtenerVariable, If, Else, While, DeclaracionVariable, For, Puts, Switch,
+         Default, Break, SaltoLinea, ComillaDoble, Expr, Suma, Resta, Multiplicacion,
+         Division, ParentesisApertura, ParentesisCierre, LlaveApertura, LlaveCierre,
+         CorcheteApertura, CorcheteCierre, Incrementar, Punto_coma, Comparacion,
+         Comentario, Identificador, Numero, ERROR, Proc, Return;
+non terminal INICIO, DECLARACION_VARIABLES, PROCEDIMIENTO, ESTRUCTURAS, 
+             OBTENER_DATO_VARIABLE, 
+             OPERADOR, APERTURA, CIERRE, SENTENCIA_FOR, ESCRIBIR, DEFINICION_FOR, 
+             DEFINICION_IF, SENTENCIA_IF, SENTENCIA_SWITCH, SENTENCIA_WHILE, 
+             ARG, TEXTO_CADENA, CUERPO_SWITCH, CUERPO_WHILE;
+
+start with INICIO;
+
+INICIO ::=  ESTRUCTURAS
+;
+ESTRUCTURAS ::= 
+    ESTRUCTURAS |
+    PROCEDIMIENTO ESTRUCTURAS | PROCEDIMIENTO |
+    DECLARACION_VARIABLES ESTRUCTURAS | DECLARACION_VARIABLES | 
+    SENTENCIA_FOR ESTRUCTURAS | SENTENCIA_FOR |
+    SENTENCIA_IF ESTRUCTURAS | SENTENCIA_IF |
+    ESCRIBIR ESTRUCTURAS | ESCRIBIR |
+    SENTENCIA_SWITCH ESTRUCTURAS | SENTENCIA_SWITCH |
+    SENTENCIA_WHILE ESTRUCTURAS | SENTENCIA_WHILE |
+    ARG ESTRUCTURAS | ARG | TEXTO_CADENA ESTRUCTURAS | TEXTO_CADENA
+;
+DECLARACION_VARIABLES ::= DeclaracionVariable Identificador |
+                          DeclaracionVariable Identificador Cadena |
+                          DeclaracionVariable Identificador Numero |
+                          DeclaracionVariable Identificador OperadorBooleano |
+                          DeclaracionVariable Identificador APERTURA Expr Identificador OPERADOR_ARITMETICO Identificador CIERRE |
+                          DeclaracionVariable Identificador APERTURA Expr ObtenerDatoVariable OPERADOR_ARITMETICO ObtenerDatoVariable CIERRE |
+                          DeclaracionVariable Identificador APERTURA Expr APERTURA ObtenerDatoVariable OPERADOR_ARITMETICO ObtenerDatoVariable CIERRE CIERRE |
+;
+APERTURA ::= LlaveApertura | CorcheteApertura |  ParentesisApertura
+;
+
+CIERRE ::= LlaveCierre | CorcheteCierre | ParentesisCierre
+;
+OPERADOR ::= Suma | Resta | Multiplicacion | Division
+;
+OBTENER_DATO_VARIABLE ::= Dolar Identificador
+;
+ESCRIBIR ::= Puts ComillaDoble Cadena ComillaDoble |
+             Puts ComillaDoble TEXTO_CADENA ComillaDoble |
+             Puts ComillaDoble
+;
+TEXTO_CADENA ::= Cadena | OBTENER_DATO_VARIABLE Cadena | Cadena OBTENER_DATO_VARIABLE | 
+                 Cadena TEXTO_CADENA | OBTENER_DATO_VARIABLE TEXTO_CADENA | 
+                 APERTURA TEXTO_CADENA CIERRE
+;
+PROCEDIMIENTO ::= Proc Identificador LlaveApertura Identificador Identificador LlaveCierre LlaveApertura ESTRUCTURAS Punto_coma Return ObtenerDatoVariable LlaveCierre
+;
+DEFINICION_FOR ::= LlaveApertura DeclaracionVariable identificador Numero LlaveCierre LlaveApertura OBTENER_DATO_VARIABLE Comparacion Numero Llave Cierre LlaveApertura Incrementar Identificador LlaveCierre
+;
+SENTENCIA_FOR ::= For DEFINICION_FOR LlaveApertura ESTRUCTURAS LlaveCierre |
+                  For DEFINICION_FOR LlaveApertura ESTRUCTURAS Break LlaveCierre |
+                  For DEFINICION_FOR LlaveApertura ESTRUCTURAS LlaveCierre 
+;
+DEFINICION_IF ::= LlaveApertura OBTENER_DATO_VARIABLE Comparacion OBTENER_DATO_VARIABLE LlaveCierre |
+                  LlaveApertura OBTENER_DATO_VARIABLE Comparacion OBTENER_DATO_VARIABLE LlaveCierre And DEFINICION_IF
+;
+SENTENCIA_IF ::= If DEFINICION_IF LlaveApertura ESTRUCTURAS LlaveCierre |
+                  If DEFINICION_IF LlaveApertura ESTRUCTURAS LlaveCierre Else LlaveApertura ESTRUCTURAS LlaveCierre |
+                  If DEFINICION_IF Break |
+                  If DEFINICION_IF Continue
+;
+CUERPO_SWITCH ::= ComillaDoble OBTENER_DATO_VARIABLE ComillaDoble LlaveApertura ESTRUCTURAS LlaveCierre |
+                  ComillaDoble OBTENER_DATO_VARIABLE ComillaDoble LlaveApertura ESTRUCTURAS LlaveCierre CUERPO_SWITCH                
+;
+SENTENCIA_SWITCH ::= Switch OBTENER_DATO_VARIABLE LlaveApertura CUERPO_SWITCH Default LlaveApertura ESTRUCTURAS LlaveCierre LlaveCierre 
+;
+CUERPO_WHILE ::= LlaveApertura EXPRESIONES LlaveCierre
+;
+SENTENCIA_WHILE ::= While LlaveApertura OBTENER_DATO_VARIABLE Comparacion OBTENER_DATO_VARIABLE LlaveCierre CUERPO_WHILE |
+                    While ComillaDoble OBTENER_DATO_VARIABLE Comparacion OBTENER_DATO_VARIABLE ComillaDoble CUERPO_WHILE |
+                    While LlaveApertura OBTENER_DATO_VARIABLE Comparacion Numero LlaveCierre CUERPO_WHILE | 
+                    While ComillaDoble OBTENER_DATO_VARIABLE Comparacion Numero ComillaDoble CUERPO_WHILE
+;
